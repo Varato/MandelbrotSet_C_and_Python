@@ -1,8 +1,8 @@
 #include "/Users/xinchen/anaconda3/include/python3.5m/Python.h"
 #include <math.h>
  
-#define N 9
-#define M 9
+#define N 450
+#define M 450
 
 void iterate(int *** n, int n_max, double h, double x0, double y0);
 void C_mat_gen(double *** C_mat, double x0, double y0, double h);
