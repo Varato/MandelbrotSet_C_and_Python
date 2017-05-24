@@ -63,15 +63,18 @@ def zoom_in_animate(fig, ax):
 	extent = [-2.2, 2.2, -2.2, 2.2]
 	color_mat = np.zeros([N,M,3]) 
 	img = ax.imshow(color_mat, cmap="gray", interpolation="nearest", extent=extent)
-	text = ax.text(-0.2, 2.3, "")
+	ax.scatter(0, 0, s=80, facecolors='none', edgecolors='r')	
+	text = ax.text(-0.4, 2.3, "")
+	ax.set_yticks([])
+	ax.set_xticks([])
 
 
 	def init():
 		pass
 	def update(data):
-		n, i, n_max, x = data
-		colors = [RGB*x for x in np.linspace(0,1,n_max+1)]
-		text.set_text("iteration times = {0}; frames count = {1}; x = {2:.3f}".format(n_max, i, x))
+		n, i, n_max, x, y = data
+		colors = [RGB*x for x in np.tanh(np.linspace(0,5,n_max+1))]
+		text.set_text("iteration times = {0}; frames count = {1}; x, y = {2:.3f}, {3:.3f},".format(n_max, i, x, y))
 		for i in range(N):
 			for j in range(M):
 				color_mat[i,j] = colors[n[i,j]][:]
@@ -79,26 +82,33 @@ def zoom_in_animate(fig, ax):
 		return (text, img)
 		
 	def data_gen():
-		q = np.array([0.,0.])
-		h = 0.005
-		n_max = min(int(0.8/h), 120)
+		q = np.array([-0.0098,-0.806])
+		h = 0.01
+		n_max = int(1/h)
 		scale_rate = 1.2
-		v = np.array([-0.01, 0])
-		for i in range(1000):
-			print("current t = {}".format(i+1))
-			if q[0] > -1.42:
-				n = np.array(Mand.iterate(n_max, h, q[0], q[1]), dtype=int)[:]
-				q = q+ i*v
-			else:
-				h = h/scale_rate
-				n_max = min(int(0.8/h), 400)
-				n = np.array(Mand.iterate(n_max, h, q[0], q[1]), dtype=int)[:]
-			yield (n, i, n_max, q[0])
+		for i in range(2):
+			print("frames count = {}".format(i+1))
+			n = np.array(Mand.iterate(n_max, h, q[0], q[1]), dtype=int)[:]
+			h = h/scale_rate
+			n_max = int(1/h)
+			yield (n, i, n_max, q[0], q[1])
+	def save_figs():
+		for n, k, n_max, x, y in data_gen():
+			colors = [RGB*x for x in np.tanh(np.linspace(0,5,n_max+1))]
+			text.set_text("iteration times = {0}; frames count = {1}; x, y = {2:.3f}, {3:.3f},".format(n_max, k, x, y))
+			for i in range(N):
+				for j in range(M):
+					color_mat[i,j] = colors[n[i,j]][:]
+			img.set_data(color_mat)
+			plt.savefig("./imgs/img{}.png".format(k), dpi=300)
+	save_figs()
 
 
-	anim = animation.FuncAnimation(fig, update, data_gen, init_func=init, interval=500)
+
+	# anim = animation.FuncAnimation(fig, update, data_gen, init_func=init, interval=500)
+	# print("saving animation...")
 	# anim.save('Mandelbrot_zoom.gif', writer='imagemagick', fps=300)
-	plt.show()
+	# plt.show()
 
 
 
