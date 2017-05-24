@@ -1,8 +1,8 @@
 #include "/Users/qinglingzhang/anaconda/include/python3.6m/Python.h"
 #include <math.h>
  
-#define N 450
-#define M 450
+#define N 451
+#define M 451
 
 void iterate(int ** n, int n_max, double h, double x0, double y0);
 void C_mat_gen(double *** C_mat, double x0, double y0, double h);
@@ -63,8 +63,8 @@ void C_mat_gen(double *** C_mat, double x0, double y0, double h)
 	double c[2];
 	for(int i = 0; i<N; i++)
 		for(int j = 0; j<M; j++){
-			c[0] = x0 + j*h;
-			c[1] = y0 + (N-1-i)*h;
+			c[0] = x0 + (j-(int)(M/2))*h;
+			c[1] = y0 + ((int)(N/2)-i)*h;
 			C_mat[i][j][0] = c[0];
 			C_mat[i][j][1] = c[1];
 		}
