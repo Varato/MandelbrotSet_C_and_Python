@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.cm as cm
 import itertools as it
 import Mandelbrot as Mand
 
@@ -30,7 +31,7 @@ def iter_animate(fig, ax, RGB, iter_times = 10):
 	extent = [-2.2, 2.2, -2.2, 2.2]
 	color_mat = np.zeros([N,M,3]) 
 	img = ax.imshow(color_mat, cmap="gray", interpolation="nearest", extent=extent)
-	text = ax.text(1.1, 2.3, "")
+	text = ax.text(-0.5, 2.3, "")
 	h = 0.01
 	x0 = 0.
 	y0 = 0.
@@ -64,50 +65,52 @@ def zoom_in_animate(fig, ax):
 	color_mat = np.zeros([N,M,3]) 
 	img = ax.imshow(color_mat, cmap="gray", interpolation="nearest", extent=extent)
 	ax.scatter(0, 0, s=80, facecolors='none', edgecolors='r')	
-	text = ax.text(-0.4, 2.3, "")
+	text = ax.text(-1.5, 2.3, "")
 	ax.set_yticks([])
 	ax.set_xticks([])
 
+	cmap = cm.get_cmap("Spectral")
+	colors = [x[:3] for x in cmap(np.linspace(0,1,30))]
+	n_colors = len(colors)
 
 	def init():
 		pass
 	def update(data):
 		n, i, n_max, x, y = data
-		colors = [RGB*x for x in np.tanh(np.linspace(0,5,n_max+1))]
 		text.set_text("iteration times = {0}; frames count = {1}; x, y = {2:.3f}, {3:.3f},".format(n_max, i, x, y))
+		print("iteration times = {0}, frames count = {1}".format(n_max, i+1))
 		for i in range(N):
 			for j in range(M):
-				color_mat[i,j] = colors[n[i,j]][:]
+				color_mat[i,j] = colors[n[i,j]%n_colors]
 		img.set_data(color_mat)
 		return (text, img)
 		
 	def data_gen():
 		q = np.array([-0.0098,-0.806])
-		h = 0.01
-		n_max = int(1/h)
+		h0 = 0.01
 		scale_rate = 1.2
-		for i in range(2):
-			print("frames count = {}".format(i+1))
+		for i in range(60):
+			h = h0/scale_rate**i
+			n_max = min(int(1/h),30000)
 			n = np.array(Mand.iterate(n_max, h, q[0], q[1]), dtype=int)[:]
-			h = h/scale_rate
-			n_max = int(1/h)
 			yield (n, i, n_max, q[0], q[1])
+
 	def save_figs():
 		for n, k, n_max, x, y in data_gen():
-			colors = [RGB*x for x in np.tanh(np.linspace(0,5,n_max+1))]
+			# colors = [RGB*x for x in np.tanh(np.linspace(0,5,n_max+1))]
 			text.set_text("iteration times = {0}; frames count = {1}; x, y = {2:.3f}, {3:.3f},".format(n_max, k, x, y))
 			for i in range(N):
 				for j in range(M):
-					color_mat[i,j] = colors[n[i,j]][:]
+					color_mat[i,j] = colors[n[i,j]%n_colors][:]
 			img.set_data(color_mat)
+			print("saving img {}...".format(k))
 			plt.savefig("./imgs/img{}.png".format(k), dpi=300)
-	save_figs()
+	# save_figs()
 
 
-
-	# anim = animation.FuncAnimation(fig, update, data_gen, init_func=init, interval=500)
-	# print("saving animation...")
-	# anim.save('Mandelbrot_zoom.gif', writer='imagemagick', fps=300)
+	anim = animation.FuncAnimation(fig, update, data_gen, init_func=init, interval=500)
+	print("saving animation...")
+	anim.save('Mandelbrot_zoom_ultimate.gif', writer='imagemagick', fps=300)
 	# plt.show()
 
 
