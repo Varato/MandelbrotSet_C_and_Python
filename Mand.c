@@ -141,7 +141,7 @@ static PyMethodDef MandMethods[] = {
 static struct PyModuleDef MandModule = {
   PyModuleDef_HEAD_INIT,
 
-  "Mand",           /* name of module */
+  "Mandelbrot",           /* name of module */
   "the Mandelbrot module",  /* Doc string (may be NULL) */
   -1,                 /* Size of per-interpreter state or -1 */
   MandMethods       /* Method table */
@@ -149,7 +149,7 @@ static struct PyModuleDef MandModule = {
 
 /* Module initialization function */
 PyMODINIT_FUNC
-PyInit_Mand(void) {
+PyInit_Mandelbrot(void) {
   return PyModule_Create(&MandModule);
 } 
 

@@ -1,4 +1,4 @@
 from distutils.core import setup, Extension
 
-setup(name='Mand',
-      ext_modules=[Extension('Mand', ['Mand.c'])])
+setup(name='Mandelbrot',
+      ext_modules=[Extension('Mandelbrot', ['Mand.c'])])
